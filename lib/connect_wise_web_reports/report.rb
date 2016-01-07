@@ -8,23 +8,26 @@ module ConnectWiseWebReports
         limit: 100,
         order_by: nil,
         skip: nil,
-        timeout: 5
+        timeout: 5,
+
+        # authentication
+        host: ConnectWiseWebReports.configuration.host,
+        company_id: ConnectWiseWebReports.configuration.company_id,
+        integrator_id: ConnectWiseWebReports.configuration.integrator_id,
+        integrator_password: ConnectWiseWebReports.configuration.integrator_password,
+        version: ConnectWiseWebReports.configuration.version
     }
 
-    attr_accessor :options, :name
+    attr_accessor :options, :name, :records
 
     def initialize(name, options = {})
       @name = name
       @options = DEFAULT_OPTIONS.merge(options)
+      @records = fetch
     end
 
     # @return [Array(Hash)]
-    def records
-      @records ||= get
-    end
-
-    # @return [Array(Hash)]
-    def get
+    def fetch
       response = self.agent.get(url)
       doc = Nokogiri::XML(response.content)
 
@@ -33,7 +36,7 @@ module ConnectWiseWebReports
         raise doc.xpath('//error/message').first.children.first.text
       end
 
-      @records = self.parse_records doc.xpath('//results/row')
+      self.parse_records doc.xpath('//results/row')
 
       return self.records
     end
@@ -54,15 +57,15 @@ module ConnectWiseWebReports
     #
     # @return [String]
     def url
-      url = "https://#{ConnectWiseWebReports.configuration.host}/#{ConnectWiseWebReports.configuration.version}/webreport/"
+      url = "https://#{self.options[:host]}/#{self.options[:version]}/webreport/"
 
       # Report
       url += "?r=#{self.name}"
 
       # API credentials
-      url += "&c=#{ConnectWiseWebReports.configuration.company_id.to_s}"
-      url += "&u=#{ConnectWiseWebReports.configuration.integrator_id.to_s}"
-      url += "&p=#{ConnectWiseWebReports.configuration.integrator_password.to_s}"
+      url += "&c=#{self.options[:company_id].to_s}"
+      url += "&u=#{self.options[:integrator_id].to_s}"
+      url += "&p=#{self.options[:integrator_password].to_s}"
 
       #order
       url += "&o=#{self.options[:order_by].to_s}" unless self.options[:order_by].nil?
@@ -84,15 +87,13 @@ module ConnectWiseWebReports
     end
 
     def parse_records(rows)
-      records = []
+      self.records = []
 
       rows.each do |row|
         record = Hash.from_xml(row.to_s)['row'].to_snake_keys.with_indifferent_access
         record.delete 'result_number'
-        records << record
+        self.records << record
       end
-
-      return records
     end
 
 
@@ -119,7 +120,7 @@ module ConnectWiseWebReports
       self.options[:skip] = 0 if self.options[:skip].nil?
       self.options[:skip] += self.options[:limit]
 
-      return self.get
+      return self.fetch
     end
 
     def previous_page?
@@ -130,7 +131,7 @@ module ConnectWiseWebReports
       self.options[:skip] -= self.options[:limit]
       self.options[:skip] = [0, self.options[:skip]].max # ensure we don't skip negative
 
-      return self.get
+      return self.fetch
     end
 
   end
