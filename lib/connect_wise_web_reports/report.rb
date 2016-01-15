@@ -15,7 +15,11 @@ module ConnectWiseWebReports
         company_id: ConnectWiseWebReports.configuration.company_id,
         integrator_id: ConnectWiseWebReports.configuration.integrator_id,
         integrator_password: ConnectWiseWebReports.configuration.integrator_password,
-        version: ConnectWiseWebReports.configuration.version
+        version: ConnectWiseWebReports.configuration.version,
+        proxy_host: ConnectWiseWebReports.configuration.proxy_host,
+        proxy_port: ConnectWiseWebReports.configuration.proxy_port,
+        proxy_user: ConnectWiseWebReports.configuration.proxy_user,
+        proxy_pass: ConnectWiseWebReports.configuration.proxy_pass
     }
 
     attr_accessor :options, :name, :records
@@ -46,6 +50,14 @@ module ConnectWiseWebReports
     # @return [Mechanize]
     def agent
       agent = Mechanize.new
+
+      agent.set_proxy(
+          self.options[:proxy_host],
+          self.options[:proxy_port],
+          self.options[:proxy_user],
+          self.options[:proxy_pass]
+      ) unless self.options[:proxy_host].nil?
+
       agent.read_timeout = self.options[:timeout]
       agent.keep_alive = false
       agent.idle_timeout = 5

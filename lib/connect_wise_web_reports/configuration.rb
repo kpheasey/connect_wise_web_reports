@@ -13,7 +13,8 @@ module ConnectWiseWebReports
   end
 
   class Configuration
-    attr_accessor :host, :company_id, :integrator_id, :integrator_password, :version
+    attr_accessor :host, :company_id, :integrator_id, :integrator_password, :version,
+                  :proxy_host, :proxy_port, :proxy_user, :proxy_pass
 
     def initialize
       @version = 'v4_6_release'
