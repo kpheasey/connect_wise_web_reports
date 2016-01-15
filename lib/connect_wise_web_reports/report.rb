@@ -49,20 +49,18 @@ module ConnectWiseWebReports
     #
     # @return [Mechanize]
     def agent
-      agent = Mechanize.new
+      Mechanize.new do |agent|
+        agent.set_proxy(
+            self.options[:proxy_host],
+            self.options[:proxy_port],
+            self.options[:proxy_user],
+            self.options[:proxy_pass]
+        ) unless self.options[:proxy_host].nil?
 
-      agent.set_proxy(
-          self.options[:proxy_host],
-          self.options[:proxy_port],
-          self.options[:proxy_user],
-          self.options[:proxy_pass]
-      ) unless self.options[:proxy_host].nil?
-
-      agent.read_timeout = self.options[:timeout]
-      agent.keep_alive = false
-      agent.idle_timeout = 5
-
-      return agent
+        agent.read_timeout = self.options[:timeout]
+        agent.keep_alive = false
+        agent.idle_timeout = 5
+      end
     end
 
     # Generate the Web Report request url.
