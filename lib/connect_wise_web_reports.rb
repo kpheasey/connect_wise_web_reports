@@ -51,7 +51,11 @@ module ConnectWiseWebReports
     url = "https://#{options[:host]}/login/companyinfo/#{options[:company_id]}"
     response = agent(options).get(url)
 
-    return JSON.parse(response.content)
+    if response.content == 'null'
+      return {}
+    else
+      return JSON.parse(response.content)
+    end
   end
 
 end
