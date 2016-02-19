@@ -2,37 +2,17 @@ module ConnectWiseWebReports
 
   class Report
 
-    DEFAULT_OPTIONS = {
-        conditions: nil,
-        fields: [],
-        limit: 100,
-        order_by: nil,
-        skip: nil,
-        timeout: 5,
-
-        # authentication
-        host: ConnectWiseWebReports.configuration.host,
-        company_id: ConnectWiseWebReports.configuration.company_id,
-        integrator_id: ConnectWiseWebReports.configuration.integrator_id,
-        integrator_password: ConnectWiseWebReports.configuration.integrator_password,
-        version: ConnectWiseWebReports.configuration.version,
-        proxy_host: ConnectWiseWebReports.configuration.proxy_host,
-        proxy_port: ConnectWiseWebReports.configuration.proxy_port,
-        proxy_user: ConnectWiseWebReports.configuration.proxy_user,
-        proxy_pass: ConnectWiseWebReports.configuration.proxy_pass
-    }
-
     attr_accessor :options, :name, :records
 
     def initialize(name, options = {})
       @name = name
-      @options = DEFAULT_OPTIONS.merge(options)
+      @options = ConnectWiseWebReports::DEFAULT_OPTIONS.merge(options)
       @records = fetch
     end
 
     # @return [Array(Hash)]
     def fetch
-      response = self.agent.get(url)
+      response = ConnectWiseWebReports.agent(options).get(url)
       doc = Nokogiri::XML(response.content)
 
       # raise errors if we got them
@@ -43,24 +23,6 @@ module ConnectWiseWebReports
       self.parse_records doc.xpath('//results/row')
 
       return self.records
-    end
-
-    # Create a new Mechanize agent.
-    #
-    # @return [Mechanize]
-    def agent
-      Mechanize.new do |agent|
-        agent.set_proxy(
-            self.options[:proxy_host],
-            self.options[:proxy_port],
-            self.options[:proxy_user],
-            self.options[:proxy_pass]
-        ) unless self.options[:proxy_host].nil?
-
-        agent.read_timeout = self.options[:timeout]
-        agent.keep_alive = false
-        agent.idle_timeout = 5
-      end
     end
 
     # Generate the Web Report request url.
