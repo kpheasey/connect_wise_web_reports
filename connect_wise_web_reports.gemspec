@@ -10,8 +10,9 @@ Gem::Specification.new do |spec|
   spec.email         = ['kevin@kpheasey.com']
 
   spec.summary       = %q{Connect Wise Web Reports API Wrapper}
-  spec.description   = %q{Connect Wise Web Reports API Wrapper}
+  spec.description   = %q{Full support Connect Wise Web Reports API, including custom queries, pagination, api info, and more.  }
   spec.homepage      = 'https://github.com/kpheasey/connect_wise_web_reports'
+  spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
@@ -29,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.10'
   spec.add_development_dependency 'rake', '~> 10.0'
 
-  spec.add_dependency 'mechanize', '~> 2.7.0'
-  spec.add_dependency 'nokogiri', '~> 1.6.0'
+  spec.add_runtime_dependency 'mechanize', '~> 2.7', '>= 2.7.0'
+  spec.add_runtime_dependency 'nokogiri', '~> 1.6', '>= 1.6.0'
   spec.add_dependency 'plissken', '~> 0.2.0'
 end
