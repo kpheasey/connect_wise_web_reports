@@ -4,6 +4,41 @@ module ConnectWiseWebReports
 
     attr_accessor :options, :name, :records
 
+    # Generate the Web Report request url.
+    #
+    # @param name [String]
+    # @param options [Hash]
+    # @return [String]
+    def self.url(name, options = {})
+      url = "https://#{options[:host]}/#{options[:version]}/webreport/"
+
+      # Report
+      url += "?r=#{name}"
+
+      # API credentials
+      url += "&c=#{options[:company_id].to_s}"
+      url += "&u=#{options[:integrator_id].to_s}"
+      url += "&p=#{options[:integrator_password].to_s}"
+
+      #order
+      url += "&o=#{options[:order_by].to_s}" unless options[:order_by].nil?
+
+      # pagination
+      url += "&l=#{options[:limit].to_s}" unless options[:limit].nil?
+      url += "&s=#{options[:skip].to_s}" unless options[:skip].nil?
+
+      # timeout
+      url += "&t=#{options[:timeout].to_s}" unless options[:timeout].nil?
+
+      # fields
+      url += "&f=#{options[:fields].join('&f=')}" unless options[:fields].nil? || options[:fields].empty?
+
+      # conditions
+      url += "&q=#{options[:conditions]}" unless options[:conditions].blank?
+
+      return URI.escape(url)
+    end
+
     def initialize(name, options = {})
       @name = name
       @options = ConnectWiseWebReports::DEFAULT_OPTIONS.merge(options)
@@ -25,37 +60,8 @@ module ConnectWiseWebReports
       return self.records
     end
 
-    # Generate the Web Report request url.
-    #
-    # @return [String]
     def url
-      url = "https://#{self.options[:host]}/#{self.options[:version]}/webreport/"
-
-      # Report
-      url += "?r=#{self.name}"
-
-      # API credentials
-      url += "&c=#{self.options[:company_id].to_s}"
-      url += "&u=#{self.options[:integrator_id].to_s}"
-      url += "&p=#{self.options[:integrator_password].to_s}"
-
-      #order
-      url += "&o=#{self.options[:order_by].to_s}" unless self.options[:order_by].nil?
-
-      # pagination
-      url += "&l=#{self.options[:limit].to_s}" unless self.options[:limit].nil?
-      url += "&s=#{self.options[:skip].to_s}" unless self.options[:skip].nil?
-
-      # timeout
-      url += "&t=#{self.options[:timeout].to_s}" unless self.options[:timeout].nil?
-
-      # fields
-      url += "&f=#{self.options[:fields].join('&f=')}" unless self.options[:fields].nil? || self.options[:fields].empty?
-
-      # conditions
-      url += "&q=#{self.options[:conditions]}" unless self.options[:conditions].blank?
-
-      return URI.escape(url)
+      Report.url(self.name, self.options)
     end
 
     def parse_records(rows)
