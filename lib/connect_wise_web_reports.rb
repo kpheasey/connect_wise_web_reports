@@ -43,6 +43,7 @@ module ConnectWiseWebReports
       agent.read_timeout = options[:timeout]
       agent.keep_alive = false
       agent.idle_timeout = 5
+      agent.open_timeout = options[:timeout]
     end
   end
 
