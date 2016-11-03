@@ -10,33 +10,35 @@ module ConnectWiseWebReports
     # @param options [Hash]
     # @return [String]
     def self.url(name, options = {})
-      url = "https://#{options[:host]}/#{options[:version]}/webreport/"
-
       # Report
-      url += "?r=#{name}"
+      params = "r=#{name}"
 
       # API credentials
-      url += "&c=#{options[:company_id].to_s}"
-      url += "&u=#{options[:integrator_id].to_s}"
-      url += "&p=#{options[:integrator_password].to_s}"
+      params += "&c=#{options[:company_id].to_s}"
+      params += "&u=#{options[:integrator_id].to_s}"
+      params += "&p=#{options[:integrator_password].to_s}"
 
       #order
-      url += "&o=#{options[:order_by].to_s}" unless options[:order_by].nil?
+      params += "&o=#{options[:order_by].to_s}" unless options[:order_by].nil?
 
       # pagination
-      url += "&l=#{options[:limit].to_s}" unless options[:limit].nil?
-      url += "&s=#{options[:skip].to_s}" unless options[:skip].nil?
+      params += "&l=#{options[:limit].to_s}" unless options[:limit].nil?
+      params += "&s=#{options[:skip].to_s}" unless options[:skip].nil?
 
       # timeout
-      url += "&t=#{options[:timeout].to_s}" unless options[:timeout].nil?
+      params += "&t=#{options[:timeout].to_s}" unless options[:timeout].nil?
 
       # fields
-      url += "&f=#{options[:fields].join('&f=')}" unless options[:fields].nil? || options[:fields].empty?
+      params += "&f=#{options[:fields].join('&f=')}" unless options[:fields].nil? || options[:fields].empty?
 
       # conditions
-      url += "&q=#{options[:conditions]}" unless options[:conditions].blank?
+      params += "&q=#{CGI.escape(options[:conditions])}" unless options[:conditions].blank?
 
-      return URI.escape(url)
+      url = "https://#{options[:host]}/#{options[:version]}/webreport/?#{params}"
+
+      ConnectWiseWebReports.logger.info url
+
+      return url
     end
 
     def initialize(name, options = {})
