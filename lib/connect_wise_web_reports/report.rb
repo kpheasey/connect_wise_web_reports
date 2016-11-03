@@ -32,9 +32,9 @@ module ConnectWiseWebReports
       params += "&f=#{options[:fields].join('&f=')}" unless options[:fields].nil? || options[:fields].empty?
 
       # conditions
-      params += "&q=#{CGI.escape(options[:conditions])}" unless options[:conditions].blank?
+      params += "&q=#{options[:conditions]}" unless options[:conditions].blank?
 
-      url = "https://#{options[:host]}/#{options[:version]}/webreport/?#{params}"
+      url = "https://#{options[:host]}/#{options[:version]}/webreport/?#{CGI.escape(params)}"
 
       ConnectWiseWebReports.logger.info url
 
