@@ -14,27 +14,29 @@ module ConnectWiseWebReports
       params = "r=#{name}"
 
       # API credentials
-      params += "&c=#{options[:company_id].to_s}"
-      params += "&u=#{options[:integrator_id].to_s}"
-      params += "&p=#{options[:integrator_password].to_s}"
+      params += "&c=#{CGI.escape options[:company_id].to_s}"
+      params += "&u=#{CGI.escape options[:integrator_id].to_s}"
+      params += "&p=#{CGI.escape options[:integrator_password].to_s}"
 
       #order
-      params += "&o=#{options[:order_by].to_s}" unless options[:order_by].nil?
+      params += "&o=#{CGI.escape options[:order_by].to_s}" unless options[:order_by].nil?
 
       # pagination
-      params += "&l=#{options[:limit].to_s}" unless options[:limit].nil?
-      params += "&s=#{options[:skip].to_s}" unless options[:skip].nil?
+      params += "&l=#{CGI.escape options[:limit].to_s}" unless options[:limit].nil?
+      params += "&s=#{CGI.escape options[:skip].to_s}" unless options[:skip].nil?
 
       # timeout
-      params += "&t=#{options[:timeout].to_s}" unless options[:timeout].nil?
+      params += "&t=#{CGI.escape options[:timeout].to_s}" unless options[:timeout].nil?
 
       # fields
-      params += "&f=#{options[:fields].join('&f=')}" unless options[:fields].nil? || options[:fields].empty?
+      unless options[:fields].nil? || options[:fields].empty?
+        params += "&f=#{options[:fields].map { |f| CGI.escape f }.join('&f=')}"
+      end
 
       # conditions
-      params += "&q=#{options[:conditions]}" unless options[:conditions].blank?
+      params += "&q=#{CGI.escape options[:conditions]}" unless options[:conditions].blank?
 
-      url = "https://#{options[:host]}/#{options[:version]}/webreport/?#{CGI.escape(params)}"
+      url = "https://#{options[:host]}/#{options[:version]}/webreport/?#{params}"
 
       ConnectWiseWebReports.logger.info url
 
