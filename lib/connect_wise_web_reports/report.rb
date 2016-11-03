@@ -50,18 +50,21 @@ module ConnectWiseWebReports
       response = ConnectWiseWebReports.agent(options).get(url)
       doc = Nokogiri::XML(response.content)
 
-      # raise errors if we got them
-      unless doc.xpath('//error/message').empty?
-        if doc.xpath('//error/message').first.children.any?
-          raise doc.xpath('//error/message').first.children.first.text
-        else
-          raise doc.xpath('//error/message').first.text
-        end
-      end
+      raise_fetch_error(doc) unless doc.xpath('//error/message').empty?
 
       self.parse_records doc.xpath('//results/row')
 
       return self.records
+    end
+
+    def raise_fetch_error(doc)
+      if doc.xpath('//error/message').first.children.any?
+        raise doc.xpath('//error/message').first.children.first.text
+      else
+        raise doc.xpath('//error/message').first.text
+      end
+    rescue
+      raise doc.xpath('//error/message').inspect
     end
 
     def url
