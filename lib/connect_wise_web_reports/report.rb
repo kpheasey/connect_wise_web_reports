@@ -52,7 +52,11 @@ module ConnectWiseWebReports
 
       # raise errors if we got them
       unless doc.xpath('//error/message').empty?
-        raise doc.xpath('//error/message').first.children.first.text
+        if doc.xpath('//error/message').first.children.any?
+          raise doc.xpath('//error/message').first.children.first.text
+        else
+          raise doc.xpath('//error/message').first.text
+        end
       end
 
       self.parse_records doc.xpath('//results/row')
