@@ -1,6 +1,5 @@
 require 'mechanize'
 require 'nokogiri'
-require 'plissken'
 
 require 'connect_wise_web_reports/version'
 require 'connect_wise_web_reports/configuration'

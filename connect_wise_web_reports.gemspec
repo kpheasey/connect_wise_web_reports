@@ -24,5 +24,4 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'mechanize', '~> 2.7', '>= 2.7.0'
   spec.add_runtime_dependency 'nokogiri', '~> 1.6', '>= 1.6.0'
-  spec.add_dependency 'plissken', '~> 0.2.0'
 end

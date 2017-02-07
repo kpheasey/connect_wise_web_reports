@@ -72,7 +72,7 @@ module ConnectWiseWebReports
       self.records = []
 
       rows.each do |row|
-        record = Hash.from_xml(row.to_s)['row'].to_snake_keys.with_indifferent_access
+        record = Hash.from_xml(row.to_s)['row']
         record.delete 'result_number'
         self.records << record
       end
