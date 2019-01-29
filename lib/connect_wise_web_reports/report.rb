@@ -51,12 +51,17 @@ module ConnectWiseWebReports
 
     # @return [Array(Hash)]
     def fetch
-      response = ConnectWiseWebReports.agent(options).get(url)
+      begin
+        response = ConnectWiseWebReports.agent(options).get(url)
+      rescue StandardError => e
+        raise ConnectionError.new(e.message)
+      end
+
       doc = Nokogiri::XML(response.content)
 
       # raise errors if we got them
       unless doc.xpath('//error/message').empty?
-        raise doc.xpath('//error/message').first.children.first.text
+        raise ConnectionError.new(doc.xpath('//error/message').first.children.first.text)
       end
 
       self.parse_records doc.xpath('//results/row')
